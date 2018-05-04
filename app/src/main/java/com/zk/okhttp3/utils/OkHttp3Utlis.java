@@ -142,6 +142,13 @@ public class OkHttp3Utlis {
         }).start();
     }
 
+    /**
+     *
+     * Post请求
+     *
+     * FormBody:用来提交一个不包涵文件的参数
+     * 第
+     */
     public void postOkhttp(String url, Map<String, String> map, Callback callBack) {
         //上传文字格式 数据的传输，区别于多媒体输出
         FormBody.Builder formbody = new FormBody.Builder();
@@ -172,6 +179,44 @@ public class OkHttp3Utlis {
         }
     }
 
+
+    /**
+     * MultipartBody：用来提交包涵文件的参数
+     *
+     * @param path    :路径
+     * @param map     ：普通参数
+     * @param img     ：提交文件的关键字
+     * @param imgPath ：提交文件的路径
+     */
+    public void postFileOkhttp(String path, HashMap<String, String> map, String img, String imgPath, Callback callBack) {
+        MultipartBody.Builder requestBody = new MultipartBody.Builder();
+        if (map!=null && !map.isEmpty()) {
+            //上传参数
+            for (String key : map.keySet()) {
+                requestBody.addFormDataPart(key, map.get(key));
+            }
+            File file = new File(imgPath);
+            requestBody.addFormDataPart(img, file.getPath()
+                    , RequestBody.create(MediaType.parse("image/png"), file));
+            Request request = new Request.Builder()
+                    .post(requestBody.build())
+                    .url(path)
+                    .build();
+            Call call = client.newCall(request);
+            call.enqueue(callBack);
+        }else{
+            File file = new File(imgPath);
+            requestBody.addFormDataPart(img, file.getPath()
+                    , RequestBody.create(MediaType.parse("image/png"), file));
+            Request request = new Request.Builder()
+                    .post(requestBody.build())
+                    .url(path)
+                    .build();
+            Call call = client.newCall(request);
+            call.enqueue(callBack);
+        }
+    }
+
     /**
      * 获取JavaBean工具类
      */
@@ -184,48 +229,6 @@ public class OkHttp3Utlis {
     }
 
 
-    /**
-     * Post请求
-     * FormBody:用来提交一个不包涵文件的参数
-     * MultipartBody：用来提交包涵文件的参数
-     */
-    public void posttURL(String url, HashMap<String, String> map, Callback callBack) {
 
-        //创建FormBody的Builder对象
-        FormBody.Builder requestBody = new FormBody.Builder();
-        for (String key : map.keySet()) {
-            requestBody.add(key, map.get(key));
-        }
-        //创建请求体
-        RequestBody body = requestBody.build();
-        Request request = new Request.Builder()
-                .post(body)
-                .url(url)
-                .build();
-        Call call = client.newCall(request);
-        call.enqueue(callBack);
 
-    }
-
-    /**
-     * @param path    :路径
-     * @param map     ：普通参数
-     * @param img     ：提交文件的关键字
-     * @param imgPath ：提交文件的路径
-     */
-    public void postFileURL(String path, HashMap<String, String> map, String img, String imgPath, Callback callBack) {
-        MultipartBody.Builder requestBody = new MultipartBody.Builder();
-        for (String key : map.keySet()) {
-            requestBody.addFormDataPart(key, map.get(key));
-        }
-        File file = new File(imgPath);
-        requestBody.addFormDataPart(img, file.getPath()
-                , RequestBody.create(MediaType.parse("image/png"), file));
-        Request request = new Request.Builder()
-                .post(requestBody.build())
-                .url(path)
-                .build();
-        Call call = client.newCall(request);
-        call.enqueue(callBack);
-    }
 }
